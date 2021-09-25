@@ -177,4 +177,24 @@ class TarefasController extends Controller
             return redirect()->route('tarefas.list')->with('warning', 'Tarefa não encontrada');
         }
     }
+
+    public function pesquisar(Request $request)
+    {
+        $request->validate([
+            'pesquisa' => [
+                'required',
+                'max:255',
+                'string'
+            ]
+        ]);
+
+        $pesquisa = $request->input('pesquisa');
+
+        // Eloquent ORM
+        $list = Tarefa::where('titulo', 'like', '%' . $pesquisa . '%')->get();
+
+        return view('tarefas.list', [
+            'list' => $list
+        ]);
+    }
 }

@@ -36,6 +36,9 @@ Route::prefix('/tarefas')->group(function () {
 
     // Marca tarefa como concluída
     Route::get('marcar/{id}', [\App\Http\Controllers\TarefasController::class, 'done'])->name('tarefas.done');
+
+    // Pesquisa de tarefas
+    Route::get('pesquisar', [\App\Http\Controllers\TarefasController::class, 'pesquisar'])->name('tarefas.pesquisar');
 });
 
 Route::fallback(function () {
