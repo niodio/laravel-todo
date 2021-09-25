@@ -1,5 +1,9 @@
 # Meu segundo app criado paraestudo de Laravel 8
 
+## Print
+
+    ![Tela](../img/printpng)
+
 ## Simples ToDo list CRUD com Query builder
 
     Sistema simples de ToDo List sem estilização, utilizado somente para o aprendizado de CRUD com Query Builder
