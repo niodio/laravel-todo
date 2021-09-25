@@ -2,7 +2,7 @@
 
 ## Print
 
-    ![Tela](../../img/print.png)
+    ![Tela](/../img/print.png)
 
 ## Simples ToDo list CRUD com Query builder
 
