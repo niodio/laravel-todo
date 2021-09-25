@@ -4,6 +4,8 @@
 
     Sistema simples de ToDo List sem estilização, utilizado somente para o aprendizado de CRUD com Query Builder
 
+    OBS.: Sistema do CRUD Query Builder foi transformado para Eloquent ORM com Model
+
 ## Para Executar
 
 - entre no diretorio raiz
