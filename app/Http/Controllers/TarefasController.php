@@ -5,14 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Tarefa;
+
 class TarefasController extends Controller
 {
     public function list()
     {
-        $list = DB::select('select * from tarefas');
-        //$list = DB::table('tarefas')->get();
+        // Query Builder
+        //$list = DB::select('select * from tarefas');
 
-        return view('tarefas.list', ['list' => $list]);
+        // Eloquent ORM
+        $list = Tarefa::all();
+
+        return view('tarefas.list', [
+            'list' => $list
+        ]);
     }
 
 
@@ -23,37 +30,51 @@ class TarefasController extends Controller
 
     public function addAction(Request $request)
     {
-        if ($request->filled('titulo')) {
-            $titulo = $request->input('titulo');
+        $request->validate([
+            'titulo' => [
+                'required',
+                'max:255',
+                'string'
+            ]
+        ]);
 
-            //Insert into DB
-            DB::insert('insert into tarefas (titulo) values (:titulo)', [
-                'titulo' => $titulo
-            ]);
+        $titulo = $request->input('titulo');
 
-            return redirect()->route('tarefas.list');
-        } else {
-            return redirect()->route('tarefas.add')->with('warning', 'Preencha o campo titulo');
-        }
+        // Query Builder
+        //Insert into DB
+        /*DB::insert('insert into tarefas (titulo) values (:titulo)', [
+            'titulo' => $titulo
+        ]);
+        */
+
+        // Eloquent ORM
+        $tarefa = new Tarefa();
+        $tarefa->titulo = $titulo;
+        $tarefa->save();
+
+
+        return redirect()->route('tarefas.list');
     }
 
     public function edit($id)
     {
-
-        $data = DB::select('select * from tarefas where id = :id', [
+        // Query Builder
+        /*$data = DB::select('select * from tarefas where id = :id', [
             'id' => $id
         ]);
+        */
 
-        if (count($data) > 0) {
+        // Eloquent ORM
+        $data = Tarefa::find($id);
+
+        if ($data) {
             return view('tarefas.edit', [
-                'data' => $data[0]
+                'data' => $data
             ]);
         } else {
             return redirect()->route('tarefas.list');
         }
     }
-
-
 
     public function editAction(Request $request, $id)
     {
@@ -61,16 +82,28 @@ class TarefasController extends Controller
             $titulo = $request->input('titulo');
             $resolvido = $request->input('resolvido');
 
-            $data = DB::select('select * from tarefas where id = :id', [
+            // Query Builder
+            /*$data = DB::select('select * from tarefas where id = :id', [
                 'id' => $id
             ]);
+            */
 
-            if (count($data) > 0) {
-                DB::update('update tarefas set titulo = :titulo, resolvido = :resolvido where id = :id', [
+            // Eloquent ORM
+            $data = Tarefa::find($id);
+
+            if ($data) {
+                //Query builder
+                /*DB::update('update tarefas set titulo = :titulo, resolvido = :resolvido where id = :id', [
                     'id' => $id,
                     'titulo' => $titulo,
                     'resolvido' => $resolvido
                 ]);
+                */
+
+                // Eloquent ORM
+                $data->titulo = $titulo;
+                $data->resolvido = $resolvido;
+                $data->save();
             }
 
             return redirect()->route('tarefas.list');
@@ -83,10 +116,19 @@ class TarefasController extends Controller
 
     public function del($id)
     {
+        // Query Builder
         //Delete from DB
-        DB::delete('delete from tarefas where id = :id', [
+        /*DB::delete('delete from tarefas where id = :id', [
             'id' => $id
         ]);
+        */
+
+        // Eloquent ORM
+        $data = Tarefa::find($id);
+
+        if ($data) {
+            $data->delete();
+        }
 
         return redirect()->route('tarefas.list')
             ->with('warning', 'Tarefa deletada.');
@@ -94,8 +136,8 @@ class TarefasController extends Controller
 
     public function done($id)
     {
-
-        $data = DB::select('select * from tarefas where id = :id', [
+        // Query Builder
+        /*$data = DB::select('select * from tarefas where id = :id', [
             'id' => $id
         ]);
 
@@ -113,6 +155,26 @@ class TarefasController extends Controller
             ]);
 
             return redirect()->route('tarefas.list')->with('warning', 'Resolvido - desmarcado - atualizado para - marcado');
+        }
+        */
+
+        //Eloquent ORM
+        $data = Tarefa::find($id);
+
+        if ($data) {
+            if ($data->resolvido === 1) {
+                $data->resolvido = 0;
+                $data->save();
+
+                return redirect()->route('tarefas.list')->with('warning', 'Resolvido - marcado  - atualizado para - desmarcar');
+            } else {
+                $data->resolvido = 1;
+                $data->save();
+
+                return redirect()->route('tarefas.list')->with('warning', 'Resolvido - desmarcado - atualizado para - marcado');
+            }
+        } else {
+            return redirect()->route('tarefas.list')->with('warning', 'Tarefa não encontrada');
         }
     }
 }

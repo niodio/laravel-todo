@@ -14,7 +14,7 @@
     <form method="post">
         @csrf
                 @method('PUT')
-
+ 
             <label for="titulo">Título</label>
                 
             <input type="text" name="titulo" id="titulo" value="{{ $data->titulo }}">
